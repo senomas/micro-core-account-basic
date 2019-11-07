@@ -4,13 +4,43 @@ import { ApolloServer } from 'apollo-server-express';
 import shrinkRay from 'shrink-ray-current';
 import express from 'express';
 import { buildSchema, MiddlewareFn } from 'type-graphql';
+import math, { BigNumber } from "mathjs";
+import { GraphQLScalarType, Kind } from "graphql";
+import { isString } from "util";
+import Decimal from "decimal.js";
 
 import { getUser } from './authentication';
 import { customAuthChecker } from './authorization';
-import { SocketResolver } from './resolvers/socket';
 import { logger } from './services/service';
+import { SavingResolver } from "./resolvers/saving";
+import { RootResolver } from "./resolvers/root";
+import { AccountResolver } from "./resolvers/account";
+import { CoreResolver } from "./resolvers/core";
 smap.install();
 
+export const BigNumberScalar = new GraphQLScalarType({
+  name: 'BigNumber',
+  description: 'BigNumber scalar type',
+  parseValue(value: string) {
+    return value && value.length > 0 ? math.bignumber(value) : null;
+  },
+  serialize(value: BigNumber) {
+    return value.toFixed();
+  },
+  parseLiteral(ast) {
+    if (ast.kind === Kind.STRING) {
+      if (isString(ast.value)) {
+        return math.bignumber(ast.value);
+      }
+      throw new TypeError(
+        `Currency cannot represent an invalid currency-string ${ast.value}.`
+      );
+    }
+    throw new TypeError(
+      `Currency cannot represent an invalid currency-string ${ast}.`
+    );
+  }
+});
 
 export const ResolveTime: MiddlewareFn = async ({ info }, next) => {
   const start = Date.now();
@@ -31,7 +61,8 @@ class BasicLogging {
 
 export async function bootstrap() {
   const schema = await buildSchema({
-    resolvers: [SocketResolver],
+    resolvers: [RootResolver, CoreResolver, AccountResolver, SavingResolver],
+    scalarsMap: [{ type: Decimal, scalar: BigNumberScalar }],
     authChecker: customAuthChecker,
     authMode: "null",
     emitSchemaFile: true,

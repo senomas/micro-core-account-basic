@@ -43,9 +43,15 @@ keys:
       MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEpeOuuNBBoUyTeg71pKVvmHYirKs3uxBj
       HrC91cZhQyl5+eqQhXoJ1BsXrCmTUHzet1rKDeJ0712huA0iygENNg==
       -----END PUBLIC KEY-----
+  core-account-basic:
+    key: |
+      -----BEGIN PUBLIC KEY-----
+      MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAETibXvcWc1mS8A9cuUFqthq2Mf5etgAXb
+      nMZPo3pKlPbBVJUeTPVfCqmoLpui2+6/wMuv8xMcunRlbOJulUJGXQ==
+      -----END PUBLIC KEY-----
     pkey: |
       -----BEGIN EC PRIVATE KEY-----
-      MHQCAQEEIAilIscCzqkDcqRNLDeBt/bWsDt+VSewMxHg7U7U6CXSoAcGBSuBBAAK
-      oUQDQgAEpeOuuNBBoUyTeg71pKVvmHYirKs3uxBjHrC91cZhQyl5+eqQhXoJ1BsX
-      rCmTUHzet1rKDeJ0712huA0iygENNg==
+      MHQCAQEEIJl4hv5sTP9slDsWikJ0i0cVnrPd0BMlUfBNd/dsVEFioAcGBSuBBAAK
+      oUQDQgAETibXvcWc1mS8A9cuUFqthq2Mf5etgAXbnMZPo3pKlPbBVJUeTPVfCqmo
+      Lpui2+6/wMuv8xMcunRlbOJulUJGXQ==
       -----END EC PRIVATE KEY-----

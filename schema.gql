@@ -3,16 +3,18 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-type Channel {
-  target: String!
-  node: String!
-  channelKey: String!
+type Account {
+  cif: String!
+  name: String!
+  savings: [Saving!]!
+  saving(id: String!): Saving
 }
 
-input ChannelInput {
-  target: String!
-  node: String!
-  channelKey: String!
+"""BigNumber scalar type"""
+scalar BigNumber
+
+type Core {
+  account(cif: String!): Account!
 }
 
 """
@@ -20,20 +22,21 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
-type Message {
-  source: String!
-  time: DateTime!
-  correlationKey: String
-  raw: String!
-}
-
-type Mutation {
-  open(target: String!): Channel!
-  close(channel: ChannelInput!): Boolean!
-  send(timeout: Int!, message: String!, channel: ChannelInput!): [Message!]!
-  syncSend(timeout: Int!, message: String!, target: String!): [Message!]!
-}
-
 type Query {
-  retrieve(timeout: Int!, channel: ChannelInput!): [Message!]!
+  core: Core
+}
+
+type Saving {
+  id: String!
+  balance: BigNumber!
+  transactions(from: DateTime, to: DateTime!, skip: Int, limit: Int): [Transaction!]!
+}
+
+type Transaction {
+  ref: String!
+  time: DateTime!
+  target: String!
+  type: String!
+  balance: BigNumber!
+  note: String
 }

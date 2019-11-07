@@ -1,20 +1,26 @@
-import { Arg, Query, Resolver, Root } from 'type-graphql';
+import { Query, Resolver, Root, FieldResolver, Args } from 'type-graphql';
 
-import { Account, Saving } from '../schemas/account';
+import { Account, Saving, AccountArgs, SavingArgs } from '../schemas/account';
 
-@Resolver()
+export class AccountService {
+  public cif: string;
+  public name: string;
+
+  public savings: Saving[];
+}
+
+@Resolver(of => Account)
 export class AccountResolver {
-
-  @Query(returns => Account)
-  public async account(@Arg("cif") cif: string): Promise<Account> {
-    return {
-      cif,
-      name: `Account ${cif}`
-    };
+  @FieldResolver(returns => [Saving])
+  public async savings(@Root() account: AccountService): Promise<Saving[]> {
+    return account.savings;
   }
 
-  @Query(returns => [Saving])
-  public async savings(@Root() account: Account): Promise<Saving[]> {
-    return [];
+  @FieldResolver(returns => Saving, { nullable: true })
+  public async saving(
+    @Root() account: AccountService,
+    @Args() { id }: SavingArgs
+  ): Promise<Saving> {
+    return account.savings.filter(s => s.id === id)[0];
   }
 }

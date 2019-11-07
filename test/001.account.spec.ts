@@ -33,139 +33,33 @@ export class SyncSocketTest extends BaseTest {
   @test
   public async openChannelNoServer() {
     const res = await this.post({
-      query: `mutation open($target: String!) {
-        open(target: $target) {
-          target
-          node
-          channelKey
+      query: `query account($cif: String!, $savingId: String!, $from: DateTime!, $to: DateTime!) {
+        core {
+          account(cif: $cif) {
+            cif
+            name
+            savings {
+              id
+              balance
+            }
+            saving(id: $savingId) {
+              id
+              balance
+              transactions(from: $from, to: $to) {
+                time
+              }
+            }
+          }
         }
       }`,
       variables: {
-        target: "noserver"
-      }
-    });
-    expect(res.status, res.log).to.eql(200);
-    expect(res.body, res.log).to.haveOwnProperty("errors");
-    expect(res.body.errors[0].message, res.log).to.eql("connect ECONNREFUSED 127.0.0.1:9999");
-  }
-
-
-  @test
-  public async openChannel() {
-    const res = await this.post({
-      query: `mutation open($target: String!) {
-        open(target: $target) {
-          target
-          node
-          channelKey
-        }
-      }`,
-      variables: {
-        target: "core"
+        cif: "10001",
+        savingId: "100000002",
+        from: new Date(),
+        to: new Date()
       }
     });
     expect(res.status, res.log).to.eql(200);
     expect(res.body, res.log).to.not.haveOwnProperty("errors");
-    values.channel = res.body.data.open;
-  }
-
-  @test
-  public async sendMessage() {
-    const res = await this.post({
-      query: `mutation sendMesssage($channel: ChannelInput!, $message: String!, $timeout: Int!) {
-        send(channel: $channel, message: $message, timeout: $timeout) {
-          source
-          time
-          correlationKey
-          raw
-        }
-      }`,
-      variables: {
-        channel: values.channel,
-        message: "data 1\ndata 2\nfoo",
-        timeout: 3
-      }
-    });
-    expect(res.status, res.log).to.eql(200);
-    expect(res.body, res.log).to.not.haveOwnProperty("errors");
-    expect(res.body.data.send.map(v => v.raw), res.log).to.eql(["data 1"]);
-  }
-  @test
-  public async retreiveMessage() {
-    const res = await this.post({
-      query: `query retrieveMessage($channel: ChannelInput!, $timeout: Int!) {
-        retrieve(channel: $channel, timeout: $timeout) {
-          source
-          correlationKey
-          raw
-        }
-      }`,
-      variables: {
-        channel: values.channel,
-        timeout: 3
-      }
-    });
-    expect(res.status, res.log).to.eql(200);
-    expect(res.body, res.log).to.not.haveOwnProperty("errors");
-    expect(res.body.data, res.log).to.haveOwnProperty("retrieve");
-    expect(res.body.data.retrieve.map(v => v.raw), res.log).to.eql(["data 2"]);
-  }
-
-  @test
-  public async sendMessage2() {
-    const res = await this.post({
-      query: `mutation sendMesssage($channel: ChannelInput!, $message: String!, $timeout: Int!) {
-        send(channel: $channel, message: $message, timeout: $timeout) {
-          source
-          time
-          correlationKey
-          raw
-        }
-      }`,
-      variables: {
-        channel: values.channel,
-        message: "data 3\n",
-        timeout: 0
-      }
-    });
-    expect(res.status, res.log).to.eql(200);
-    expect(res.body, res.log).to.not.haveOwnProperty("errors");
-    expect(res.body.data.send.length, res.log).to.eql(0);
-  }
-
-  @test
-  public async retreiveMessage2() {
-    const res = await this.post({
-      query: `query retrieveMessage($channel: ChannelInput!, $timeout: Int!) {
-        retrieve(channel: $channel, timeout: $timeout) {
-          source
-          correlationKey
-          raw
-        }
-      }`,
-      variables: {
-        channel: values.channel,
-        timeout: 3
-      }
-    });
-    expect(res.status, res.log).to.eql(200);
-    expect(res.body, res.log).to.not.haveOwnProperty("errors");
-    expect(res.body.data, res.log).to.haveOwnProperty("retrieve");
-    expect(res.body.data.retrieve.map(v => v.raw), res.log).to.eql(["foodata 3"]);
-  }
-
-  @test
-  public async closeChannel() {
-    const res = await this.post({
-      query: `mutation close($channel: ChannelInput!) {
-        close(channel: $channel)
-      }`,
-      variables: {
-        channel: values.channel
-      }
-    });
-    expect(res.status, res.log).to.eql(200);
-    expect(res.body, res.log).to.not.haveOwnProperty("errors");
-    values.channel = res.body.data.open;
   }
 }
