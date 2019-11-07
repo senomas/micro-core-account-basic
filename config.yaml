@@ -1,0 +1,51 @@
+logger:
+  period: 1d
+  count: 3
+  path: log
+auth:
+  curves: secp256k1
+api:
+  protocol: http
+  host: localhost
+  port: 5000
+redis:
+  host: localhost
+  port: 5006
+  maxPoolSize: 30
+socket-connector:
+  targets:
+    noserver:
+      type: SyncEOF
+      eof: "\n"
+      host: localhost
+      port: 9999
+    core:
+      type: SyncEOF
+      eof: "\n"
+      host: localhost
+      port: 9000
+keys:
+  auth:
+    key: |
+      -----BEGIN PUBLIC KEY-----
+      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEO5gl9qu1vfftugBe3j5fJetJUhbV
+      4GFtYCuLVvpGX44dgjmjjKQ6fAAiYagdQlo5FAlh4Mp3ua6kFk2G15tywA==
+      -----END PUBLIC KEY-----
+  account:
+    key: |
+      -----BEGIN PUBLIC KEY-----
+      MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEP9Xj+RfjpBxjmURMLozwuD5BhG8y
+      zdh7lwTUT0dkNLZuWbma+JLNBh8H/xVBx7Znu/aTKIICq10yNL0vHSVgEg==
+      -----END PUBLIC KEY-----
+  socket-connector:
+    key: |
+      -----BEGIN PUBLIC KEY-----
+      MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEpeOuuNBBoUyTeg71pKVvmHYirKs3uxBj
+      HrC91cZhQyl5+eqQhXoJ1BsXrCmTUHzet1rKDeJ0712huA0iygENNg==
+      -----END PUBLIC KEY-----
+    pkey: |
+      -----BEGIN EC PRIVATE KEY-----
+      MHQCAQEEIAilIscCzqkDcqRNLDeBt/bWsDt+VSewMxHg7U7U6CXSoAcGBSuBBAAK
+      oUQDQgAEpeOuuNBBoUyTeg71pKVvmHYirKs3uxBjHrC91cZhQyl5+eqQhXoJ1BsX
+      rCmTUHzet1rKDeJ0712huA0iygENNg==
+      -----END EC PRIVATE KEY-----
