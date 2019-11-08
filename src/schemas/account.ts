@@ -6,6 +6,15 @@ import Decimal from "decimal.js";
 export class Core {
 }
 
+@ObjectType()
+export class ServerInfo {
+  @Field()
+  public host: string;
+
+  @Field()
+  public time: Date;
+}
+
 @ArgsType()
 export class AccountArgs {
   @Field()
@@ -15,6 +24,9 @@ export class AccountArgs {
 
 @ObjectType()
 export class Account {
+  @Field({ nullable: true })
+  public cid?: string;
+
   @Field()
   public cif: string;
 

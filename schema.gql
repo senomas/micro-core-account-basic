@@ -4,6 +4,7 @@
 # -----------------------------------------------
 
 type Account {
+  cid: String
   cif: String!
   name: String!
   savings: [Saving!]!
@@ -14,7 +15,9 @@ type Account {
 scalar BigNumber
 
 type Core {
-  account(cif: String!): Account!
+  serverInfo: ServerInfo!
+  account(cif: String!): Account
+  saving(id: String!): Saving
 }
 
 """
@@ -29,7 +32,13 @@ type Query {
 type Saving {
   id: String!
   balance: BigNumber!
+  account: Account!
   transactions(from: DateTime, to: DateTime!, skip: Int, limit: Int): [Transaction!]!
+}
+
+type ServerInfo {
+  host: String!
+  time: DateTime!
 }
 
 type Transaction {

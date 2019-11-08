@@ -1,0 +1,55 @@
+version: "3"
+services:
+  redis:
+    image: redis:4.0.9-alpine
+  app1:
+    build: .
+    ports:
+      - 5000
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - SERVICE_PORTS=5000
+  app2:
+    build: .
+    ports:
+      - 5000
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - SERVICE_PORTS=5000
+  app3:
+    build: .
+    ports:
+      - 5000
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - SERVICE_PORTS=5000
+  app4:
+    build: .
+    ports:
+      - 5000
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - SERVICE_PORTS=5000
+  core:
+    build: ../mockup-core
+    ports:
+      - 9000:9000
+    environment:
+      - NODE_ENV=development
+  proxy:
+    image: dockercloud/haproxy
+    links:
+      - app1
+      - app2
+      - app3
+      - app4
+    environment:
+      - BALANCE=leastconn
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 5000:80

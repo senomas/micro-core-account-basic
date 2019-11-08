@@ -6,14 +6,10 @@ const gitlog = require("gitlog");
 const fs = require("fs");
 const netstat = require('node-netstat');
 
-async function tsc() {
-  await shell.exec("npx tsc -p tsconfig.build.json", {
+async function build() {
+  await shell.exec("yarn build", {
     async: false
   });
-}
-
-async function build() {
-  await tsc();
   await copyData();
   const commits = gitlog({
     repo: ".",
@@ -132,8 +128,8 @@ async function test() {
   await shell.exec("rm -rf log dist", {
     async: false
   });
-  await build();
   await dockerUp();
+  await build();
   const proc = spawn("node", ["dist/server.js"], {
     env: {
       PATH: process.env.PATH,
@@ -143,8 +139,17 @@ async function test() {
   });
   proc.stdout.pipe(process.stdout);
   proc.stderr.pipe(process.stderr);
+  const proc2 = spawn("yarn", ["start"], {
+    cwd: "../mockup-core",
+    env: {
+      PATH: process.env.PATH,
+      NODE_ENV: "test"
+    }
+  });
+  proc2.stdout.pipe(process.stdout);
+  proc2.stderr.pipe(process.stderr);
   console.log("waiting server...");
-  await waitPorts([5000])
+  await waitPorts([5000, 9000])
   console.log(
     `npx mocha -r ts-node/register ${
     args.bail ? "-b" : ""
@@ -163,12 +168,11 @@ async function test() {
       async: false
     }
   );
-  proc.kill();
+  await killPorts([5000, 9000]);
 }
 
 module.exports = {
   fix,
-  tsc,
   copyData,
   build,
   dockerUp,

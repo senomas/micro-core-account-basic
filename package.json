@@ -6,9 +6,8 @@
   "author": "denmaseno <agus@senomas.com>",
   "license": "MIT",
   "scripts": {
-    "fix": "npx gulp fix",
-    "build": "npx gulp build",
-    "start": "yarn build && node dist/src/server.js",
+    "build": "npx tslint --project . --fix && npx tsc -p tsconfig.build.json",
+    "start": "yarn build && node dist/server.js",
     "test": "npx gulp test",
     "dev": "nodemon"
   },

@@ -4,12 +4,16 @@ logger:
   path: log
 auth:
   curves: secp256k1
-redis:
+api:
+  protocol: http
   host: localhost
-  port: 5006
+  port: 5000
+redis:
+  host: redis
+  port: 6379
   maxPoolSize: 30
 core:
-  host: localhost
+  host: core
   port: 9000
 keys:
   auth:
