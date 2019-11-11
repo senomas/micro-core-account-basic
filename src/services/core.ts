@@ -20,43 +20,43 @@ export class CoreServicexxx {
   }
 
   public async send(request: any, timeout: number): Promise<any> {
-    // const socket = new Socket();
-    // let cid = "not-connected";
-    // return new Promise((resolve, reject) => {
-    //   let buf = Buffer.from([]);
-    //   const timerh = setTimeout(() => {
-    //     resolve(null);
-    //     socket.end();
-    //   }, timeout * 1000);
-    //   socket.setTimeout(timeout * 1000);
-    //   socket.connect(this.port, this.host);
-    //   socket.on('connect', () => {
-    //     cid = `${socket.localPort}-${socket.remoteAddress}:${socket.remotePort}`;
-    //     logger.info({ cid }, "SYNC-CONNECTED");
-    //   });
-    //   socket.once('ready', () => {
-    //     logger.info({ cid }, "SYNC-READY");
-    //     socket.write(JSON.stringify(request));
-    //     socket.write("\n");
-    //   });
-    //   socket.on('data', async (data: Buffer) => {
-    //     buf = Buffer.concat([buf, data], buf.length + data.length);
-    //     const ix = buf.indexOf('\n');
-    //     if (ix >= 0) {
-    //       clearTimeout(timerh);
-    //       resolve(JSON.parse(buf.slice(0, ix).toString('utf8')));
-    //       socket.end();
-    //     }
-    //   });
-    //   socket.on("timeout", () => {
-    //     logger.info({ cid }, "SYNC-TIMEOUT");
-    //     socket.end();
-    //   });
-    //   socket.on('error', err => {
-    //     logger.info({ cid, err }, "SYNC-ERROR");
-    //     reject(err);
-    //   });
-    // });
+    const socket = new Socket();
+    let cid = "not-connected";
+    return new Promise((resolve, reject) => {
+      let buf = Buffer.from([]);
+      const timerh = setTimeout(() => {
+        resolve(null);
+        socket.end();
+      }, timeout * 1000);
+      socket.setTimeout(timeout * 1000);
+      socket.connect(this.port, this.host);
+      socket.on('connect', () => {
+        cid = `${socket.localPort}-${socket.remoteAddress}:${socket.remotePort}`;
+        logger.info({ cid }, "SYNC-CONNECTED");
+      });
+      socket.once('ready', () => {
+        logger.info({ cid }, "SYNC-READY");
+        socket.write(JSON.stringify(request));
+        socket.write("\n");
+      });
+      socket.on('data', async (data: Buffer) => {
+        buf = Buffer.concat([buf, data], buf.length + data.length);
+        const ix = buf.indexOf('\n');
+        if (ix >= 0) {
+          clearTimeout(timerh);
+          resolve(JSON.parse(buf.slice(0, ix).toString('utf8')));
+          socket.end();
+        }
+      });
+      socket.on("timeout", () => {
+        logger.info({ cid }, "SYNC-TIMEOUT");
+        socket.end();
+      });
+      socket.on('error', err => {
+        logger.info({ cid, err }, "SYNC-ERROR");
+        reject(err);
+      });
+    });
   }
 
   public async getAccount(cif: string): Promise<AccountService> {

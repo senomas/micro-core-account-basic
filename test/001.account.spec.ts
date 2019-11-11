@@ -6,7 +6,36 @@ import { BaseTest } from "./base";
 @suite
 export class SyncSocketTest extends BaseTest {
 
-  // @test
+  @test
+  public async testSavingId() {
+    const res = await this.post({
+      query: `query account($cif: String!, $savingId: String!, $from: DateTime!, $to: DateTime!) {
+        core {
+          account(cif: $cif) {
+            cif
+            name
+            saving(id: $savingId) {
+              id
+              balance
+              transactions(from: $from, to: $to) {
+                time
+              }
+            }
+          }
+        }
+      }`,
+      variables: {
+        cif: "10001",
+        savingId: "1000000001",
+        from: new Date(),
+        to: new Date()
+      }
+    });
+    expect(res.status, res.log).to.eql(200);
+    expect(res.body, res.log).to.not.haveOwnProperty("errors");
+  }
+
+  @test
   public async testAccountSaving() {
     const res = await this.post({
       query: `query account($cif: String!, $savingId: String!, $from: DateTime!, $to: DateTime!) {
@@ -39,7 +68,7 @@ export class SyncSocketTest extends BaseTest {
     expect(res.body, res.log).to.not.haveOwnProperty("errors");
   }
 
-  // @test
+  @test
   public async testSavingAccount() {
     const res = await this.post({
       query: `query account($savingId: String!, $from: DateTime!, $to: DateTime!) {

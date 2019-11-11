@@ -16,7 +16,7 @@ processors:
   - decode_json_fields:
       fields: ["message"]
       target: ""
-      max_depth: 3
+      max_depth: 10
       overwrite_keys: true
 
 output.elasticsearch:

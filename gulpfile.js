@@ -122,6 +122,7 @@ async function fix() {
     async: false
   });
 }
+
 async function test() {
   await fix();
   await kill();
@@ -171,6 +172,22 @@ async function test() {
   await killPorts([5000, 9000]);
 }
 
+async function dtest() {
+  shell.exec(
+    `npx mocha -r ts-node/register  ${
+    args.bail ? "-b" : ""
+    } --color -t 90000 test/**/*${args.mod ? `${args.mod}*` : ""}.spec.ts`,
+    {
+      env: {
+        PATH: process.env.PATH,
+        NODE_ENV: "test",
+        TEST_SERVER: `http://localhost:5010`
+      },
+      async: false
+    }
+  );
+}
+
 module.exports = {
   fix,
   copyData,
@@ -179,5 +196,6 @@ module.exports = {
   dockerDown,
   run,
   kill,
-  test
+  test,
+  dtest
 };

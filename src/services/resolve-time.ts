@@ -2,7 +2,7 @@ import { MiddlewareFn } from "type-graphql";
 
 import { logger } from "./service";
 
-export const ResolveTimeMiddleware: MiddlewareFn = async ({ info }, next) => {
+export const ResolveTimeMiddleware: MiddlewareFn = async ({ info, args }, next) => {
   const start = Date.now();
   await next();
   const responseTime = Date.now() - start;
@@ -13,6 +13,7 @@ export const ResolveTimeMiddleware: MiddlewareFn = async ({ info }, next) => {
   logger.info({
     graphql: {
       path: ps.join("."),
+      [`args_${info.parentType.name}_${info.fieldName}`]: args,
       type: info.parentType.name
     },
     responseTime

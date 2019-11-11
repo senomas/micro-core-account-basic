@@ -15,41 +15,45 @@ const socket: Socket = new Socket();
 
 socket.on('connect', () => {
   connId = `${socket.localPort}-${socket.remoteAddress}:${socket.remotePort}`;
-  logger.info({ connId }, "ASYNC-CONNECTED");
+  logger.info({ socket: { type: 'async', event: 'connect', connId } }, "socket");
 });
 socket.once('ready', () => {
-  logger.info({ connId }, "ASYNC-READY");
+  logger.info({ socket: { type: 'async', event: 'ready', connId } }, "socket");
 });
 socket.on('data', async (data: Buffer) => {
+  logger.info({ socket: { type: 'async', event: 'data', connId, data: data.toString('utf8') } }, "socket");
   buf = Buffer.concat([buf, data], buf.length + data.length);
   let ix = buf.indexOf('\n');
   while (ix >= 0) {
     const msg = JSON.parse(buf.slice(0, ix).toString('utf8'));
     const resp = buffers[msg.cid];
-    logger.info({ connId, message: msg }, "ASYNC-MESSAGE");
     if (resp) {
       resp.push(msg);
       event.emit(msg.cid);
     } else {
-      logger.info({ msg }, "OUT-OF TRX");
+      logger.info({ socket: { type: 'async', event: 'outOfTx', connId, message: msg } }, "socket");
     }
     buf = buf.slice(ix + 1);
     ix = buf.indexOf('\n');
   }
 });
 socket.on('error', err => {
-  logger.info({ connId, err }, "ASYNC-ERROR");
+  logger.info({ socket: { type: 'async', event: 'error', connId, err } }, "socket");
   connId = null;
 });
-socket.on('end', () => {
+socket.on('close', () => {
+  logger.info({ socket: { type: 'async', event: 'close', connId } }, "socket");
   connId = null;
   buf = Buffer.from([]);
+});
+socket.on('end', () => {
+  logger.info({ socket: { type: 'async', event: 'end', connId } }, "socket");
+  connId = null;
 });
 
 export class CoreAsyncService {
 
   constructor(private host: string, private port: number) {
-    logger.info("CORE-ASYNC-SERVICE");
   }
 
   public async send(request: any, timeout: number): Promise<any> {
@@ -59,6 +63,7 @@ export class CoreAsyncService {
         socket.connect(this.port, this.host);
       }
       const cid = `${counter++}`;
+      const t0 = Date.now();
       buffers[cid] = [];
       let timerh;
       const onMsg = () => {
@@ -66,7 +71,15 @@ export class CoreAsyncService {
         const msgs = buffers[cid];
         const msg = msgs ? msgs[0] : null;
         delete buffers[cid];
-        logger.info({ cid, message: msg }, "ON-MESSAGE");
+        logger.info({
+          socket: {
+            type: 'async',
+            event: 'receive',
+            cid,
+            messageType: request.command,
+            [`message_${request.command || '_unknown'}`]: msg
+          }, responseTime: Date.now() - t0
+        }, "socket");
         resolve(msg);
       };
       event.once(cid, onMsg);
@@ -74,11 +87,27 @@ export class CoreAsyncService {
         const msgs = buffers[cid];
         const msg = msgs ? msgs[0] : null;
         delete buffers[cid];
-        logger.info({ cid, message: msg }, "ON-TIMEOUT");
+        logger.info({
+          socket: {
+            type: 'async',
+            event: 'timeout',
+            cid,
+            messageType: request.command,
+            [`message_${request.command || '_unknown'}`]: msg
+          }, responseTime: Date.now() - t0
+        }, "socket");
         event.removeListener(cid, onMsg);
         resolve(msg);
       }, timeout * 1000);
-      logger.info({ cid, request }, "ASYNC-REQUEST");
+      logger.info({
+        socket: {
+          type: 'async',
+          event: 'send',
+          cid,
+          messageType: request.command,
+          [`request_${request.command || '_unknown'}`]: request
+        }
+      }, "socket");
       socket.write(JSON.stringify({ ...request, cid }));
       socket.write("\n");
     });
