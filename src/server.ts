@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { ApolloServer } from 'apollo-server-express';
 import shrinkRay from 'shrink-ray-current';
 import express from 'express';
-import { buildSchema, MiddlewareFn } from 'type-graphql';
+import { buildSchema } from 'type-graphql';
 import math, { BigNumber } from "mathjs";
 import { GraphQLScalarType, Kind } from "graphql";
 import { isString } from "util";
@@ -16,6 +16,8 @@ import { SavingResolver } from "./resolvers/saving";
 import { RootResolver } from "./resolvers/root";
 import { AccountResolver } from "./resolvers/account";
 import { CoreResolver } from "./resolvers/core";
+import { config } from "./config";
+import { ErrorLoggerMiddleware } from "./services/error-logger";
 smap.install();
 
 export const BigNumberScalar = new GraphQLScalarType({
@@ -42,20 +44,9 @@ export const BigNumberScalar = new GraphQLScalarType({
   }
 });
 
-export const ResolveTime: MiddlewareFn = async ({ info }, next) => {
-  const start = Date.now();
-  await next();
-  const responseTime = Date.now() - start;
-  logger.info({ path: `${info.parentType.name}.${info.fieldName}`, responseTime }, 'resolve time');
-};
-
 class BasicLogging {
-  public requestDidStart(o) {
-    logger.info({ query: o.queryString, variables: o.variables }, 'graphql request');
-  }
-
-  public willSendResponse({ graphqlResponse }) {
-    logger.info({ gqlRes: graphqlResponse }, 'graphql response');
+  public requestDidStart({ queryString, variables }) {
+    logger.info({ query: queryString, variables: variables }, 'graphql-request');
   }
 }
 
@@ -63,11 +54,19 @@ export async function bootstrap() {
   const schema = await buildSchema({
     resolvers: [RootResolver, CoreResolver, AccountResolver, SavingResolver],
     scalarsMap: [{ type: Decimal, scalar: BigNumberScalar }],
+    globalMiddlewares: [ErrorLoggerMiddleware],
     authChecker: customAuthChecker,
     authMode: "null",
     emitSchemaFile: true,
     dateScalarMode: "isoDate"
   });
+
+  const extensions = [];
+  if (config.basicLogging) {
+    extensions.push(() => {
+      return new BasicLogging();
+    });
+  }
 
   const server = new ApolloServer({
     schema,
@@ -83,19 +82,17 @@ export async function bootstrap() {
       const remoteAddress = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
       return { user, headers: req.headers, remoteAddress };
     },
-    extensions: [() => {
-      return new BasicLogging();
-    }]
+    extensions
   });
 
   const app = express();
   app.use(shrinkRay());
   server.applyMiddleware({ app });
 
-  const port = parseInt(process.env.PORT, 10 || 4000);
+  const port = parseInt(process.env.PORT || "4000", 10);
   const bindAddress = process.env.BIND_ADDRESS || "0.0.0.0";
-  const serverInfo = await app.listen(port, bindAddress);
-  logger.info({ port, bindAddress, ...serverInfo }, "Server is running");
+  await app.listen(port, bindAddress);
+  logger.info({ port, bindAddress }, "server-up");
 }
 
 bootstrap().catch(err => {

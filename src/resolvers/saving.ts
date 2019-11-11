@@ -1,12 +1,14 @@
-import { Resolver, Root, FieldResolver, Arg, Args } from 'type-graphql';
+import { Resolver, Root, FieldResolver, Arg, Args, UseMiddleware } from 'type-graphql';
 
 import { Saving, Transaction, TransactionArgs, Account } from '../schemas/account';
 import { SavingService } from '../services/saving';
+import { ResolveTimeMiddleware } from '../services/resolve-time';
 
 @Resolver(returns => Saving)
 export class SavingResolver {
 
   @FieldResolver(returns => Account)
+  @UseMiddleware(ResolveTimeMiddleware)
   public async account(
     @Root() saving: SavingService
   ): Promise<Account> {
@@ -14,6 +16,7 @@ export class SavingResolver {
   }
 
   @FieldResolver(returns => [Transaction])
+  @UseMiddleware(ResolveTimeMiddleware)
   public async transactions(
     @Root() saving: SavingService,
     @Args() { from, to }: TransactionArgs

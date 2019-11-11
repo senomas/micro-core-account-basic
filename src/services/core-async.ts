@@ -41,6 +41,10 @@ socket.on('error', err => {
   logger.info({ connId, err }, "ASYNC-ERROR");
   connId = null;
 });
+socket.on('end', () => {
+  connId = null;
+  buf = Buffer.from([]);
+});
 
 export class CoreAsyncService {
 

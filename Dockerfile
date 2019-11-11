@@ -1,6 +1,8 @@
 FROM node:12.13.0-stretch-slim
 LABEL maintainer="Senomas <agus@senomas.com>"
-RUN apt-get update && apt-get install -y build-essential git python && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+  apt-get install -y iputils-ping curl build-essential git python && \
+  rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home/node
 

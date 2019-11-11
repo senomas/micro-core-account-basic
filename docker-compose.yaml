@@ -2,44 +2,68 @@ version: "3"
 services:
   redis:
     image: redis:4.0.9-alpine
+    networks:
+      - dev
   app1:
     build: .
+    image: core-account-basic
     ports:
       - 5000
+    volumes:
+      - dlogs:/home/node/log
     environment:
       - NODE_ENV=development
       - PORT=5000
       - SERVICE_PORTS=5000
+    networks:
+      - dev
   app2:
-    build: .
+    image: core-account-basic
     ports:
       - 5000
+    volumes:
+      - dlogs:/home/node/log
     environment:
       - NODE_ENV=development
       - PORT=5000
       - SERVICE_PORTS=5000
+    networks:
+      - dev
   app3:
-    build: .
+    image: core-account-basic
     ports:
       - 5000
+    volumes:
+      - dlogs:/home/node/log
     environment:
       - NODE_ENV=development
       - PORT=5000
       - SERVICE_PORTS=5000
+    networks:
+      - dev
   app4:
-    build: .
+    image: core-account-basic
     ports:
       - 5000
+    volumes:
+      - dlogs:/home/node/log
     environment:
       - NODE_ENV=development
       - PORT=5000
       - SERVICE_PORTS=5000
+    networks:
+      - dev
   core:
     build: ../mockup-core
+    image: mockup-core
     ports:
       - 9000:9000
+    volumes:
+      - dlogs:/home/node/log
     environment:
       - NODE_ENV=development
+    networks:
+      - dev
   proxy:
     image: dockercloud/haproxy
     links:
@@ -52,4 +76,21 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - 5000:80
+      - 5010:80
+    networks:
+      - dev
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:7.4.2
+    volumes:
+      - dlogs:/var/log/nodeapp
+      - ./filebeat.yaml:/usr/share/filebeat/filebeat.yml:ro
+    networks:
+      - dev
+
+volumes:
+  dlogs:
+
+networks:
+  dev:
+    external:
+      name: dev
