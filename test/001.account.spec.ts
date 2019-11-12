@@ -119,7 +119,7 @@ export class SyncSocketTest extends BaseTest {
   }
 
   @test
-  public async testAsyncAccountCid() {
+  public async testSyncAccountCid() {
     const test = [];
     for (let i = 1001; i <= 2000; i++) {
       test.push({
@@ -152,6 +152,59 @@ export class SyncSocketTest extends BaseTest {
           name: "Invalid ID",
           t,
           res: res.data.body
+        };
+      }
+    }));
+    const { max, min, sum } = test.reduce(({ max, min, sum }, t) => {
+      const tz = t.t1 - t.t0;
+      if (sum === 0) {
+        return {
+          max: tz, min: tz, sum: tz
+        };
+      }
+      return {
+        max: Math.max(max, tz),
+        min: Math.min(min, tz),
+        sum: sum + tz
+      };
+    }, { max: 0, min: 0, sum: 0 });
+    console.log(`RESULT COUNT: ${test.length} AVG: ${sum / test.length} MIN: ${min} MAX: ${max}`);
+  }
+
+  @test
+  public async testAsyncAccountCid() {
+    const test = [];
+    for (let i = 1001; i <= 2000; i++) {
+      test.push({
+        id: i
+      });
+    }
+    await Promise.all(test.map(async t => {
+      t.t0 = Date.now();
+      const res = await this.post({
+        query: `query account($cif: String!) {
+          asyncCore {
+            account(cif: $cif) {
+              cif
+              name
+              savings {
+                id
+                balance
+              }
+            }
+          }
+        }`,
+        variables: {
+          cif: `${t.id}`,
+        }
+      });
+      t.t1 = Date.now();
+      t.res = res.body.data;
+      if (res.body.data.asyncCore.account.name !== `USER ${t.id}`) {
+        throw {
+          name: "Invalid ID",
+          t,
+          res: res.body.data
         };
       }
     }));

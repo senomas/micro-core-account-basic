@@ -27,6 +27,7 @@ scalar DateTime
 
 type Query {
   core: Core
+  asyncCore: Core
 }
 
 type Saving {

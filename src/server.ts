@@ -11,7 +11,7 @@ import Decimal from "decimal.js";
 
 import { getUser } from './authentication';
 import { customAuthChecker } from './authorization';
-import { logger } from './services/service';
+import { logger, build, NODE_ENV } from './services/service';
 import { SavingResolver } from "./resolvers/saving";
 import { RootResolver } from "./resolvers/root";
 import { AccountResolver } from "./resolvers/account";
@@ -92,7 +92,13 @@ export async function bootstrap() {
   const port = parseInt(process.env.PORT || "4000", 10);
   const bindAddress = process.env.BIND_ADDRESS || "0.0.0.0";
   await app.listen(port, bindAddress);
-  logger.info({ port, bindAddress }, "server-up");
+  logger.info({
+    port,
+    bindAddress,
+    build,
+    config: NODE_ENV === 'dev' || NODE_ENV === 'test' ? config : null,
+    message: "server up"
+  }, "server");
 }
 
 bootstrap().catch(err => {

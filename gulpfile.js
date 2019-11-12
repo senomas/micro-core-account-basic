@@ -126,7 +126,7 @@ async function fix() {
 async function test() {
   await fix();
   await kill();
-  await shell.exec("rm -rf log dist", {
+  await shell.exec("rm -rf log dist ../mockup-core/log", {
     async: false
   });
   await dockerUp();

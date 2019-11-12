@@ -7,6 +7,7 @@ services:
   app1:
     build: .
     image: core-account-basic
+    hostname: app1
     ports:
       - 5000
     volumes:
@@ -19,6 +20,7 @@ services:
       - dev
   app2:
     image: core-account-basic
+    hostname: app2
     ports:
       - 5000
     volumes:
@@ -31,6 +33,7 @@ services:
       - dev
   app3:
     image: core-account-basic
+    hostname: app3
     ports:
       - 5000
     volumes:
@@ -43,6 +46,7 @@ services:
       - dev
   app4:
     image: core-account-basic
+    hostname: app4
     ports:
       - 5000
     volumes:
@@ -56,6 +60,7 @@ services:
   core:
     build: ../mockup-core
     image: mockup-core
+    hostname: core
     ports:
       - 9000:9000
     volumes:

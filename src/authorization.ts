@@ -6,18 +6,17 @@ export const customAuthChecker: AuthChecker<any> = (
   { root, args, context, info },
   roles,
 ) => {
-  logger.info({ root, args, context, info }, "customAuthChecker");
   const user = context.user;
   const error = roles.indexOf("@null") < 0;
   if (!user) {
-    logger.info({ user, roles }, "customAuthChecker not login");
+    logger.info({ pass: false, user, roles, message: "customAuthChecker not login" }, "authorization");
     if (error) {
       throw new UnauthorizedError();
     }
     return false;
   }
   if (roles.filter(v => !v.startsWith("@")).length === 0) {
-    logger.info({ pass: true, user, roles }, "customAuthChecker");
+    logger.info({ pass: true, user, roles }, "authorization");
     return true;
   }
   let pass = false;
@@ -35,7 +34,7 @@ export const customAuthChecker: AuthChecker<any> = (
       pass = true;
     }
   }
-  logger.info({ pass, user, roles }, "customAuthChecker");
+  logger.info({ pass, user, roles }, "authorization");
   if (error && !pass) {
     throw new ForbiddenError();
   }

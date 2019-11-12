@@ -27,7 +27,7 @@ export async function parseToken(token) {
       Buffer.from(token.split(".")[0], "base64").toString("utf8")
     );
   } catch (err) {
-    logger.error({ token, err }, "invalid token header");
+    logger.error({ token, err, message: "invalid token header" }, "authentication");
     throw new AuthenticationError("InvalidTokenHeader");
   }
   const keyid = header.kid;
@@ -37,7 +37,7 @@ export async function parseToken(token) {
   try {
     return jwt.verify(token, config.keys[keyid].key);
   } catch (err) {
-    logger.error({ header, token, err }, "invalid token");
+    logger.error({ header, token, err, message: "invalid token" }, "authentication");
     if (err && err.name === "TokenExpiredError") {
       throw new AuthenticationError("TokenExpiredError");
     } else {

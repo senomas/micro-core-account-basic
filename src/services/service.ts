@@ -29,9 +29,13 @@ const serializers = {
   err: bunyan.stdSerializers.err
 };
 
+export const build = JSON.parse(fs.readFileSync("dist/build.json").toString("utf8"));
+const commit = build.commits[0].abbrevHash;
+
 export const logger = bunyan.createLogger(
   (config.logger && config.logger.path) ? {
     name: appName,
+    commit,
     serializers,
     streams: [{
       type: "rotating-file",
@@ -40,7 +44,6 @@ export const logger = bunyan.createLogger(
     }]
   } : { name: appName, serializers });
 const raw = Buffer.from(keyEncoder.encodePrivate(config.keys[appName].pkey, "pem", "raw"), "hex").toString("base64");
-logger.info({ raw, pem: config.keys[appName].pkey }, "keys");
 
 export const moduleKey = crypto.createECDH(config.auth.curves);
 moduleKey.setPrivateKey(raw, "base64");

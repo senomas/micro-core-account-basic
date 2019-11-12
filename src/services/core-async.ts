@@ -41,6 +41,10 @@ socket.on('error', err => {
   logger.info({ socket: { type: 'async', event: 'error', connId, err } }, "socket");
   connId = null;
 });
+socket.on("timeout", () => {
+  logger.info({ socket: { type: 'async', event: 'timeout', connId } }, "socket");
+  socket.end();
+});
 socket.on('close', () => {
   logger.info({ socket: { type: 'async', event: 'close', connId } }, "socket");
   connId = null;
