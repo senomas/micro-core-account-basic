@@ -19,7 +19,13 @@ processors:
       max_depth: 10
       overwrite_keys: true
 
-output.elasticsearch:
+output.elasticsearch: 
+  index: "micro-1.0.0-%{+yyyy.MM.dd}"
   hosts:
     - es01:9200
     - es02:9200
+  loadbalance: true
+
+setup.ilm.rollover_alias: "micro-1.0.0"
+setup.template.name: "micro-1.0.0"
+setup.template.pattern: "micro-1.0.0-*"

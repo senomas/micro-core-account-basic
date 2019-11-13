@@ -102,6 +102,12 @@ export async function bootstrap() {
 }
 
 bootstrap().catch(err => {
+  logger.info({
+    build,
+    config: NODE_ENV === 'dev' || NODE_ENV === 'test' ? config : null,
+    err,
+    message: "server error"
+  }, "server");
   console.error("server error", err);
   process.exit(-1);
 });

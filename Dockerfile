@@ -18,5 +18,6 @@ RUN npx tsc
 RUN mkdir dist/data
 
 ADD config.docker.yaml config.yaml
+ADD dist/build.json dist/build.json
 
 CMD [ "node", "dist/server.js" ]

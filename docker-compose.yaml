@@ -18,6 +18,15 @@ services:
       - SERVICE_PORTS=5000
     networks:
       - dev
+  packetbeat1:
+    image: docker.elastic.co/beats/packetbeat:7.4.2
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    volumes:
+      - ./packetbeat.yaml:/usr/share/packetbeat/packetbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: service:app1
   app2:
     image: core-account-basic
     hostname: app2
@@ -31,6 +40,15 @@ services:
       - SERVICE_PORTS=5000
     networks:
       - dev
+  packetbeat2:
+    image: docker.elastic.co/beats/packetbeat:7.4.2
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    volumes:
+      - ./packetbeat.yaml:/usr/share/packetbeat/packetbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: service:app2
   app3:
     image: core-account-basic
     hostname: app3
@@ -44,6 +62,15 @@ services:
       - SERVICE_PORTS=5000
     networks:
       - dev
+  packetbeat3:
+    image: docker.elastic.co/beats/packetbeat:7.4.2
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    volumes:
+      - ./packetbeat.yaml:/usr/share/packetbeat/packetbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: service:app3
   app4:
     image: core-account-basic
     hostname: app4
@@ -57,6 +84,15 @@ services:
       - SERVICE_PORTS=5000
     networks:
       - dev
+  packetbeat4:
+    image: docker.elastic.co/beats/packetbeat:7.4.2
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    volumes:
+      - ./packetbeat.yaml:/usr/share/packetbeat/packetbeat.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    network_mode: service:app4
   core:
     build: ../mockup-core
     image: mockup-core
@@ -91,7 +127,6 @@ services:
       - ./filebeat.yaml:/usr/share/filebeat/filebeat.yml:ro
     networks:
       - dev
-
 volumes:
   dlogs:
 

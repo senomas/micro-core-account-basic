@@ -1,0 +1,63 @@
+packetbeat.interfaces.device: any
+packetbeat.flows:
+  enabled: false
+  timeout: 30s
+  period: 10s
+packetbeat.protocols:
+- type: icmp
+  enabled: false
+- type: amqp
+  enabled: false
+  ports: [5672]
+- type: cassandra
+  enabled: false
+  ports: [9042]
+- type: dns
+  enabled: false
+  ports: [53]
+  include_authorities: true
+  include_additionals: true
+- type: http
+  enabled: true
+  ports: [80, 3000, 4000, 5000, 8000, 8080]
+  include_body_for: ["application/json"]
+  send_headers: ["user-agent", "x-forwarded-for", "x-request-id"]
+  send_request: false
+  send_response: false
+  transaction_timeout: 30s
+- type: memcache
+  enabled: false
+  ports: [11211]
+- type: mysql
+  enabled: true
+  ports: [3306]
+- type: pgsql
+  enabled: false
+  ports: [5432]
+- type: redis
+  enabled: true
+  ports: [6379]
+- type: thrift
+  enabled: false
+  ports: [9090]
+- type: mongodb
+  enabled: true
+  ports: [27017]
+- type: nfs
+  enabled: false
+  ports: [2049]
+- type: tls
+  enabled: false
+  ports: [443]
+output.elasticsearch:
+  enabled: true
+  index: "micro-1.0.0-%{+yyyy.MM.dd}"
+  hosts:
+    - es01:9200
+    - es02:9200
+  loadbalance: true
+
+setup.ilm.rollover_alias: "micro-1.0.0"
+setup.template.name: "micro-1.0.0"
+setup.template.pattern: "micro-1.0.0-*"
+logging.metrics.enabled: false
