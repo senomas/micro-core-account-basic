@@ -47,7 +47,7 @@
     "@types/graphql": "^14.0.7",
     "@types/mathjs": "^6.0.2",
     "@types/redis": "^2.8.14",
-    "apollo-server-express": "^2.9.7",
+    "apollo-server-express": "^2.14.2",
     "bunyan": "^1.8.12",
     "express": "^4.17.1",
     "graphql": "^14.0.0",
