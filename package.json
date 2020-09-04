@@ -65,6 +65,6 @@
     "reflect-metadata": "^0.1.13",
     "shrink-ray-current": "^4.1.2",
     "source-map-support": "^0.5.16",
-    "type-graphql": "^0.17.5"
+    "type-graphql": "^0.17.6"
   }
 }
