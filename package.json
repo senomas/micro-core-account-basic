@@ -57,7 +57,7 @@
     "key-encoder": "^2.0.3",
     "mathjs": "^6.2.3",
     "mem": "^4.0.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "mongodb": "^3.3.3",
     "node-netstat": "^1.8.0",
     "node-zopfli-es": "^1.0.3",
